@@ -3,6 +3,9 @@ import pandas as pd
 import json
 import os
 import random
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from core import compile_program, list_prompts, export_to_csv, generate_program_response
 
@@ -42,28 +45,28 @@ with gr.Blocks(css=custom_css) as demo:
 
     # Compile Program Tab
     with gr.Tabs():
-        with gr.TabItem("Compile Program"):
+        with gr.TabItem("编译程序"):
 
             with gr.Row():
                 with gr.Column():
-                    gr.Markdown("# DSPyUI: a Gradio user interface for DSPy")
-                    gr.Markdown("Compile a DSPy program by specifying your settings and providing example data.")
+                    gr.Markdown("# DSPyUI: DSPy 的 Gradio 用户界面")
+                    gr.Markdown("通过指定设置并提供示例数据来构建 DSPy 程序。")
 
                 with gr.Column():
-                    gr.Markdown("### Demo Examples:")
+                    gr.Markdown("### 示例演示：")
                     with gr.Row():  
-                        example1 = gr.Button("Judging Jokes")
-                        example2 = gr.Button("Telling Jokes")
-                        example3 = gr.Button("Rewriting Jokes")
+                        example1 = gr.Button("笑话评分")
+                        example2 = gr.Button("讲笑话")
+                        example3 = gr.Button("改写笑话")
             
             # Task Instructions
             with gr.Row():
                 with gr.Column(scale=4):
                     instructions = gr.Textbox(
-                        label="Task Instructions",
+                        label="任务指令",
                         lines=3,
-                        placeholder="Enter detailed task instructions here.",
-                        info="Provide clear and comprehensive instructions for the task. This will guide the DSPy program in understanding the specific requirements and expected outcomes.",
+                        placeholder="在此输入详细的任务指令。",
+                        info="为任务提供清晰全面的指令。这将引导 DSPy 程序理解具体要求和预期结果。",
                         interactive=True  # Add this line to ensure the textbox is editable
                     )
 
@@ -72,18 +75,18 @@ with gr.Blocks(css=custom_css) as demo:
             file_data = gr.State(None)
             with gr.Row():
                 with gr.Column():
-                    gr.Markdown("### Inputs")
-                    gr.Markdown("Add input fields for your task. Each input field represents a piece of information your DSPy program will receive.")
+                    gr.Markdown("### 输入 (Inputs)")
+                    gr.Markdown("为您的任务添加输入字段。每个输入字段代表 DSPy 程序将接收的一条信息。")
                     with gr.Row():
-                        add_input_btn = gr.Button("Add Input Field")
-                        remove_input_btn = gr.Button("Remove Last Input", interactive=False)
+                        add_input_btn = gr.Button("添加输入字段")
+                        remove_input_btn = gr.Button("移除最后一个输入", interactive=False)
 
                 with gr.Column():
-                    gr.Markdown("### Outputs")
-                    gr.Markdown("Add output fields for your task. Each output field represents a piece of information your DSPy program will generate.")
+                    gr.Markdown("### 输出 (Outputs)")
+                    gr.Markdown("为您的任务添加输出字段。每个输出字段代表 DSPy 程序将生成的一条信息。")
                     with gr.Row():  
-                        add_output_btn = gr.Button("Add Output Field")
-                        remove_output_btn = gr.Button("Remove Last Output", interactive=False)
+                        add_output_btn = gr.Button("添加输出字段")
+                        remove_output_btn = gr.Button("移除最后一个输出", interactive=False)
 
             def add_field(values):
                 new_values = values + [("", "")]
@@ -135,30 +138,30 @@ with gr.Blocks(css=custom_css) as demo:
                 with gr.Row():
                     with gr.Column():
                         if not input_values:
-                            gr.Markdown("Please add at least one input field.", elem_classes="red-text")
+                            gr.Markdown("请添加至少一个输入字段。", elem_classes="red-text")
    
                         for i, input_value in enumerate(input_values):
                             name, desc = input_value
                             with gr.Group():
                                 with gr.Row():
                                     input_name = gr.Textbox(
-                                        placeholder=f"Input{i+1}",
+                                        placeholder=f"输入{i+1}",
                                         value=name if name else None,
                                         key=f"input-name-{i}",
                                         show_label=False,
-                                        label=f"Input {i+1} Name",
-                                        info="Specify the name of this input field.",
+                                        label=f"输入 {i+1} 名称",
+                                        info="指定此输入字段的名称。",
                                         interactive=True,
                                         scale=9
                                     )
                                     expand_btn = gr.Button("▼", size="sm", scale=1, elem_classes="expand-button")
                                 input_desc = gr.Textbox(
                                     value=desc if desc else None,
-                                    placeholder=desc if desc else "Description (optional)",
+                                    placeholder=desc if desc else "描述 (可选)",
                                     key=f"input-desc-{i}",
                                     show_label=False,
-                                    label=f"Input {i+1} Description",
-                                    info="Optionally provide a description for this input field.",
+                                    label=f"输入 {i+1} 描述",
+                                    info="（可选）为此输入字段提供描述。",
                                     interactive=True,
                                     visible=False
                                 )
@@ -173,30 +176,30 @@ with gr.Blocks(css=custom_css) as demo:
                     with gr.Column():
                         
                         if not output_values:
-                            gr.Markdown("Please add at least one output field.", elem_classes="red-text")
+                            gr.Markdown("请添加至少一个输出字段。", elem_classes="red-text")
            
                         for i, output_value in enumerate(output_values):
                             name, desc = output_value
                             with gr.Group():
                                 with gr.Row():
                                     output_name = gr.Textbox(
-                                        placeholder=f"Output{i+1}",
+                                        placeholder=f"输出{i+1}",
                                         value=name if name else None,
                                         key=f"output-name-{i}",
                                         show_label=False,
-                                        label=f"Output {i+1} Name",
-                                        info="Specify the name of this output field.",
+                                        label=f"输出 {i+1} 名称",
+                                        info="指定此输出字段的名称。",
                                         scale=9,
                                         interactive=True,
                                     )
                                     expand_btn = gr.Button("▼", size="sm", scale=1, elem_classes="expand-button")
                                 output_desc = gr.Textbox(
                                     value=desc if desc else None,
-                                    placeholder=desc if desc else "Description (optional)",
+                                    placeholder=desc if desc else "描述 (可选)",
                                     key=f"output-desc-{i}",
                                     show_label=False,
-                                    label=f"Output {i+1} Description",
-                                    info="Optionally provide a description for this output field.",
+                                    label=f"输出 {i+1} 描述",
+                                    info="（可选）为此输出字段提供描述。",
                                     visible=False,
                                     interactive=True,
                                 )
@@ -339,13 +342,13 @@ with gr.Blocks(css=custom_css) as demo:
                             json.dump(details, f, indent=4)
                         return signature, evaluation_score, optimized_prompt, gr.update(choices=row_choice_options, visible=True, value="Row 1"), gr.update(visible=True), row_choice_options, gr.update(visible=True), gr.update(visible=True), human_readable_id, gr.update(visible=True), baseline_score
                     
-                gr.Markdown("### Data")
-                gr.Markdown("Provide example data for your task. This will help the DSPy compiler understand the format of your data. You can either enter the data manually or upload a CSV file with the correct column headers.")
+                gr.Markdown("### 数据 (Data)")
+                gr.Markdown("为您的任务提供示例数据。这将帮助 DSPy 编译器理解您的数据格式。您可以手动输入数据，也可以上传带有正确列标题的 CSV 文件。")
                 with gr.Column():
                     with gr.Row():
-                        enter_manually_btn = gr.Button("Enter manually", interactive=len(input_values) > 0 and len(output_values) > 0 and file_data is None)
+                        enter_manually_btn = gr.Button("手动输入", interactive=len(input_values) > 0 and len(output_values) > 0 and file_data is None)
                         
-                        upload_csv_btn = gr.UploadButton("Upload CSV", file_types=[".csv"], interactive=len(input_values) > 0 and len(output_values) > 0 and file_data is None)
+                        upload_csv_btn = gr.UploadButton("上传 CSV", file_types=[".csv"], interactive=len(input_values) > 0 and len(output_values) > 0 and file_data is None)
 
                     headers = [input_value[0] for input_value in input_values] + [output_value[0] for output_value in output_values]
                         
@@ -356,11 +359,11 @@ with gr.Blocks(css=custom_css) as demo:
                         row_count=1,
                         col_count=(len(input_values) + len(output_values), "fixed"),
                         visible=file_data is not None,  # Only visible if file_data is not None
-                        label="Example Data",
+                        label="示例数据",
                         value=file_data if file_data is not None else pd.DataFrame(columns=headers)
                     )
-                    export_csv_btn = gr.Button("Export to CSV", interactive=file_data is not None and len(input_values) > 0 and len(output_values) > 0)
-                    csv_download = gr.File(label="Download CSV", visible=False)
+                    export_csv_btn = gr.Button("导出为 CSV", interactive=file_data is not None and len(input_values) > 0 and len(output_values) > 0)
+                    csv_download = gr.File(label="下载 CSV", visible=False)
                     error_message = gr.Markdown()
                     
                     def show_dataframe(*args):
@@ -420,41 +423,41 @@ with gr.Blocks(css=custom_css) as demo:
                     outputs=[generate_output]
                 )
 
-            gr.Markdown("### Settings")
+            gr.Markdown("### 设置 (Settings)")
             with gr.Row():
                 model_options = [
                     "gpt-3.5-turbo", "gpt-4", "gpt-4o", "gpt-4o-mini",
                     "claude-3-5-sonnet-20240620", "claude-3-opus-20240229",
                     "claude-3-sonnet-20240229", "claude-3-haiku-20240307",
                     "mixtral-8x7b-32768", "gemma-7b-it", "llama3-70b-8192",
-                    "llama3-8b-8192", "gemma2-9b-it", "gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro"
+                    "llama3-8b-8192", "gemma2-9b-it", "gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-3-pro-preview"
                 ]
                 llm_model = gr.Dropdown(
                     model_options,
-                    label="Model",
+                    label="模型 (Model)",
                     value="gpt-4o-mini",
-                    info="Select the main language model for your DSPy program. This model will be used for inference. Typically you want to choose a fast and cheap model here, and train it on your task to improve quality.",
+                    info="选择您的 DSPy 程序的主语言模型。该模型将用于推理。通常建议选择一个快速且便宜的模型，并通过训练提高其质量。",
                     interactive=True  # Add this line
                 )
                 teacher_model = gr.Dropdown(
                     model_options,
-                    label="Teacher",
+                    label="教师模型 (Teacher)",
                     value="gpt-4o",
-                    info="Select a more capable (but slower and more expensive) model to act as a teacher during the compilation process. This model helps generate high-quality examples and refine prompts.",
+                    info="在编译过程中选择一个更强大的模型作为教师模型。该模型有助于生成高质量的示例并精炼提示词。",
                     interactive=True  # Add this line
                 )
                 with gr.Column():
                     dspy_module = gr.Dropdown(
                         ["Predict", "ChainOfThought", "ChainOfThoughtWithHint"],
-                        label="Module",
+                        label="模块 (Module)",
                         value="Predict",
-                        info="Choose the DSPy module that best fits your task. Predict is for simple tasks, ChainOfThought for complex reasoning, and ChainOfThoughtWithHint for guided reasoning.",
+                        info="选择最适合您任务的 DSPy 模块。Predict 用于简单任务，ChainOfThought 用于复杂推理，ChainOfThoughtWithHint 用于引导式推理。",
                         interactive=True  # This line was likely already present
                     )
                     hint_textbox = gr.Textbox(
-                        label="Hint",
+                        label="提示 (Hint)",
                         lines=2,
-                        placeholder="Enter a hint for the Chain of Thought with Hint module.",
+                        placeholder="为带有 Hint 的思维链模块输入提示词。",
                         visible=False,
                         interactive=True  # Add this line
                     )
@@ -462,37 +465,37 @@ with gr.Blocks(css=custom_css) as demo:
             with gr.Row():
                 optimizer = gr.Dropdown(
                     ["BootstrapFewShot", "BootstrapFewShotWithRandomSearch", "MIPRO", "MIPROv2", "COPRO"],
-                    label="Optimizer",
+                    label="优化器 (Optimizer)",
                     value="BootstrapFewShot",
-                    info="Choose optimization strategy: None (no optimization), BootstrapFewShot (small datasets, ~10 examples) uses few-shot learning; BootstrapFewShotWithRandomSearch (medium, ~50) adds randomized search; MIPRO, MIPROv2, and COPRO (large, 300+) also optimize the prompt instructions.",
+                    info="选择优化策略：None（不优化）；BootstrapFewShot（小数据集，约10个示例）使用少样本学习；BootstrapFewShotWithRandomSearch（中等，约50个）增加随机搜索；MIPRO, MIPROv2 和 COPRO（大型，300+）同时优化提示指令。",
                     interactive=True  # Add this line
                 )
                 with gr.Column():
                     metric_type = gr.Radio(
                         ["Exact Match", "Cosine Similarity", "LLM-as-a-Judge"],
-                        label="Metric",
+                        label="评估指标 (Metric)",
                         value="Exact Match",
-                        info="Choose how to evaluate your program's performance. Exact Match is suitable for tasks with clear correct answers, while LLM-as-a-Judge is better for open-ended or subjective tasks. Cosine Similarity can be used for fuzzier matches tasks where the output needs to be similar to the correct answer.",
+                        info="选择如何评估程序的性能。Exact Match 适用于有清晰正确答案的任务；LLM-as-a-Judge 更适合开放式或主观任务；Cosine Similarity 可用于输出需要与正确答案相似的模糊匹配任务。",
                         interactive=True  # Add this line
                     )
                     judge_prompt = gr.Dropdown(
                         choices=[],
-                        label="Judge Prompt",
+                        label="评判提示词 (Judge Prompt)",
                         visible=False,
-                        info="Select the prompt to use as the judge for evaluation.",
+                        info="选择用作评估评判的提示词程序。",
                         interactive=True  # Add this line
                     )
 
-            compile_button = gr.Button("Compile Program", visible=False, variant="primary")
+            compile_button = gr.Button("编译程序", visible=False, variant="primary")
             with gr.Column() as compilation_results:
-                gr.Markdown("### Results")
+                gr.Markdown("### 编译结果 (Results)")
                 
                 with gr.Row():
-                    signature = gr.Textbox(label="Signature", interactive=False, info="The compiled signature of your DSPy program, showing inputs and outputs.")
-                    evaluation_score = gr.Number(label="Evaluation Score", info="The evaluation score of your compiled DSPy program.", interactive=False)
-                    baseline_score = gr.Number(label="Baseline Score", info="The baseline score of your unoptimized DSPy module.", interactive=False)
+                    signature = gr.Textbox(label="签名 (Signature)", interactive=False, info="编译后的 DSPy 程序签名，展示输入和输出字段。")
+                    evaluation_score = gr.Number(label="评估分数", info="编译后的 DSPy 程序的评估得分。", interactive=False)
+                    baseline_score = gr.Number(label="基准分数", info="优化前原始 DSPy 模块的基准得分。", interactive=False)
                     
-                optimized_prompt = gr.Textbox(label="Optimized Prompt", info="The optimized prompt generated by the DSPy compiler for your program.", interactive=False)
+                optimized_prompt = gr.Textbox(label="优化后的提示词", info="DSPy 编译器为您的程序生成的优化提示内容。", interactive=False)
 
             with gr.Row():
 
@@ -501,20 +504,20 @@ with gr.Blocks(css=custom_css) as demo:
                     human_readable_id = gr.Textbox(interactive=False, visible=False)
                     row_selector = gr.Dropdown(
                         choices=[],
-                        label="Select a row from the dataset",
+                        label="从数据集中选择一行",
                         interactive=True,
                         visible=False,
-                        info="Choose a specific row from the loaded dataset to use as input for your compiled program."
+                        info="从加载的数据集中选择一个特定的行，作为编译后程序的输入进行测试。"
                     )
-                    random_row_button = gr.Button("Select Random Row", visible=False, interactive=True)
-                    generate_button = gr.Button("Generate", interactive=True, visible=False, variant="primary")
+                    random_row_button = gr.Button("随机选择一行", visible=False, interactive=True)
+                    generate_button = gr.Button("生成 (Generate)", interactive=True, visible=False, variant="primary")
 
 
                     
 
                 with gr.Column(scale=2):
                     
-                    generate_output = gr.Textbox(label="Generated Response", info="The input and output generated by your compiled DSPy program.", interactive=False, lines=10, visible=False)
+                    generate_output = gr.Textbox(label="生成的响应", info="由编译后的 DSPy 程序生成的输入和输出结果。", interactive=False, lines=10, visible=False)
 
                 def select_random_row(row_choice_options):                    
                     if row_choice_options:
@@ -617,7 +620,7 @@ with gr.Blocks(css=custom_css) as demo:
 
             
 
-        with gr.TabItem("View Prompts"):
+        with gr.TabItem("查看提示词"):
             
             prompts = list_prompts()
 
@@ -626,7 +629,7 @@ with gr.Blocks(css=custom_css) as demo:
             # Extract unique signatures for the dropdown
             unique_signatures = sorted(set(p["Signature"] for p in prompts))
 
-            close_details_btn = gr.Button("Close Details", elem_classes="close-details-btn", size="sm", visible=False)
+            close_details_btn = gr.Button("关闭详情", elem_classes="close-details-btn", size="sm", visible=False)
             close_details_btn.click(lambda: (None, gr.update(visible=False)), outputs=[selected_prompt, close_details_btn])
             
 
@@ -639,21 +642,21 @@ with gr.Blocks(css=custom_css) as demo:
                             gr.Markdown(f"## {details['human_readable_id']}")
                             with gr.Group():
                                 with gr.Column(elem_classes="prompt-details-full"):
-                                    gr.Number(value=float(selected_prompt['Eval Score']), label="Evaluation Score", interactive=False)
+                                    gr.Number(value=float(selected_prompt['Eval Score']), label="评估分数", interactive=False)
                                     
                                     with gr.Row():
-                                        gr.Dropdown(choices=details['input_fields'], value=details['input_fields'], label="Input Fields", interactive=False, multiselect=True, info=", ".join(details.get('input_descs', [])))
-                                        gr.Dropdown(choices=details['output_fields'], value=details['output_fields'], label="Output Fields", interactive=False, multiselect=True, info=", ".join(details.get('output_descs', [])))
+                                        gr.Dropdown(choices=details['input_fields'], value=details['input_fields'], label="输入字段", interactive=False, multiselect=True, info=", ".join(details.get('input_descs', [])))
+                                        gr.Dropdown(choices=details['output_fields'], value=details['output_fields'], label="输出字段", interactive=False, multiselect=True, info=", ".join(details.get('output_descs', [])))
                                     
                                     with gr.Row():
-                                        gr.Dropdown(choices=[details['dspy_module']], value=details['dspy_module'], label="Module", interactive=False)
-                                        gr.Dropdown(choices=[details['llm_model']], value=details['llm_model'], label="Model", interactive=False)
-                                        gr.Dropdown(choices=[details['teacher_model']], value=details['teacher_model'], label="Teacher Model", interactive=False)
-                                        gr.Dropdown(choices=[details['optimizer']], value=details['optimizer'], label="Optimizer", interactive=False)
+                                        gr.Dropdown(choices=[details['dspy_module']], value=details['dspy_module'], label="模块", interactive=False)
+                                        gr.Dropdown(choices=[details['llm_model']], value=details['llm_model'], label="模型", interactive=False)
+                                        gr.Dropdown(choices=[details['teacher_model']], value=details['teacher_model'], label="教师模型", interactive=False)
+                                        gr.Dropdown(choices=[details['optimizer']], value=details['optimizer'], label="优化器", interactive=False)
                                     
-                                    gr.Textbox(value=details['instructions'], label="Instructions", interactive=False)
+                                    gr.Textbox(value=details['instructions'], label="任务指令", interactive=False)
                                     
-                                    gr.Textbox(value=details['optimized_prompt'], label="Optimized Prompt", interactive=False)
+                                    gr.Textbox(value=details['optimized_prompt'], label="优化后的提示词", interactive=False)
                                     
                                     for key, value in details.items():
                                         if key not in ['signature', 'evaluation_score', 'input_fields', 'output_fields', 'dspy_module', 'llm_model', 'teacher_model', 'optimizer', 'instructions', 'optimized_prompt', 'human_readable_id']:
@@ -667,27 +670,27 @@ with gr.Blocks(css=custom_css) as demo:
                                                 gr.Textbox(value=str(value), label=key.replace('_', ' ').title(), interactive=False)
                         
 
-            gr.Markdown("# View Prompts")
+            gr.Markdown("# 查看提示词")
             
             # Add filter and sort functionality in one line
             with gr.Row():
-                filter_signature = gr.Dropdown(label="Filter by Signature", choices=["All"] + unique_signatures, value="All", scale=2)
-                sort_by = gr.Radio(["Run Date", "Evaluation Score"], label="Sort by", value="Run Date", scale=1)
-                sort_order = gr.Radio(["Descending", "Ascending"], label="Sort Order", value="Descending", scale=1)
+                filter_signature = gr.Dropdown(label="按签名过滤", choices=["全部 (All)"] + unique_signatures, value="全部 (All)", scale=2)
+                sort_by = gr.Radio(["运行日期", "评估分数"], label="排序依据", value="运行日期", scale=1)
+                sort_order = gr.Radio(["降序", "升序"], label="排序顺序", value="降序", scale=1)
 
             @gr.render(inputs=[filter_signature, sort_by, sort_order])
             def render_prompts(filter_signature, sort_by, sort_order):
-                if filter_signature and filter_signature != "All":
+                if filter_signature and filter_signature != "全部 (All)":
                     filtered_prompts = list_prompts(signature_filter=filter_signature)
                 else:
                     filtered_prompts = prompts
                 
-                if sort_by == "Evaluation Score":
+                if sort_by == "评估分数":
                     key_func = lambda x: float(x["Eval Score"])
                 else:  # Run Date
                     key_func = lambda x: x["ID"]  # Use the entire ID for sorting
                 
-                sorted_prompts = sorted(filtered_prompts, key=key_func, reverse=(sort_order == "Descending"))
+                sorted_prompts = sorted(filtered_prompts, key=key_func, reverse=(sort_order == "降序"))
                 
                 prompt_components = []
                 
@@ -700,9 +703,9 @@ with gr.Blocks(css=custom_css) as demo:
                                     with gr.Group(elem_classes="prompt-card"):
                                         with gr.Column(elem_classes="prompt-details"):
                                             gr.Markdown(f"**ID:** {prompt['ID']}")
-                                            gr.Markdown(f"**Signature:** {prompt['Signature']}")
-                                            gr.Markdown(f"**Eval Score:** {prompt['Eval Score']}")
-                                        view_details_btn = gr.Button("View Details", elem_classes="view-details-btn", size="sm")
+                                            gr.Markdown(f"**签名:** {prompt['Signature']}")
+                                            gr.Markdown(f"**评估分:** {prompt['Eval Score']}")
+                                        view_details_btn = gr.Button("查看详情", elem_classes="view-details-btn", size="sm")
                                     
                                     prompt_components.append((prompt, view_details_btn))
                 

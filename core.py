@@ -24,7 +24,8 @@ SUPPORTED_GROQ_MODELS = [
 SUPPORTED_GOOGLE_MODELS = [
     "gemini-1.5-flash-8b",
     "gemini-1.5-flash",
-    "gemini-1.5-pro"
+    "gemini-1.5-pro",
+    "gemini-3-pro-preview"
 ]
 
 # when using MIPRO or BootstrapFewShotWithRandomSearch, we need to configure the LM globally or it gives us a 'No LM loaded' error
@@ -393,11 +394,11 @@ def compile_program(input_fields: List[str], output_fields: List[str], dspy_modu
     compiled_program.save(f"programs/{human_readable_id}.json")
     print(f"Compiled program saved to programs/{human_readable_id}.json")
 
-    usage_instructions = f"""Program compiled successfully!
-Evaluation score: {score}
-Baseline score: {baseline_score}
-The compiled program has been saved as 'programs/{human_readable_id}.json'.
-You can now use the compiled program as follows:
+    usage_instructions = f"""程序编译成功！
+程序评估分数 (Evaluation score): {score}
+原始基准分数 (Baseline score): {baseline_score}
+编译后的程序已保存到 'programs/{human_readable_id}.json'。
+您现在可以按照以下方式使用编译后的程序：
 
 compiled_program = dspy.{dspy_module}(CustomSignature)
 compiled_program.load('programs/{human_readable_id}.json')
@@ -419,9 +420,9 @@ print({', '.join(f'result.{field}' for field in output_fields)})
         for msg in messages:
             final_prompt += f"{msg['content']}\n"
 
-        example_output = f"\nExample usage with first row of data:\n"
-        example_output += f"Input: {input_data}\n"
-        example_output += f"Output: {result}\n"
+        example_output = f"\n第一行数据的示例用法：\n"
+        example_output += f"输入 (Input): {input_data}\n"
+        example_output += f"输出 (Output): {result}\n"
         usage_instructions += example_output
 
     return usage_instructions, final_prompt
@@ -545,13 +546,13 @@ def generate_program_response(human_readable_id, row_data):
         return f"Error: {str(e)}"
 
     # Prepare the output
-    output = "Input:\n"
+    output = "输入 (Input):\n"
     for field in input_fields:
         output += f"{field}: {program_input[field]}\n"
 
     print("result:", result)
 
-    output += "\nOutput:\n"
+    output += "\n输出 (Output):\n"
     for field in output_fields:
         output += f"{field}: {getattr(result, field)}\n"
 
