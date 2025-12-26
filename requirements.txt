@@ -1,0 +1,8 @@
+gradio
+dspy-ai
+pandas
+openai
+anthropic
+groq
+scikit-learn
+google-generativeai

@@ -39,7 +39,7 @@ custom_css = """
 }
 """
 
-example2_signature = "JokeTopic:Funny-Gpt4oMini_ChainOfThought_Bootstrapfewshotwithrandomsearch-20241003.json - joke, topic -> funny (Score: 100)"
+example2_signature = "ContractReview:Report-Gpt4oMini_ChainOfThought_Bootstrapfewshotwithrandomsearch-20241003.json - contract_text, perspective -> expected_report (Score: 100)"
 
 with gr.Blocks(css=custom_css) as demo:
 
@@ -55,8 +55,8 @@ with gr.Blocks(css=custom_css) as demo:
                 with gr.Column():
                     gr.Markdown("### 示例演示：")
                     with gr.Row():  
-                        example1 = gr.Button("笑话评分")
-                        example2 = gr.Button("讲笑话")
+                        example1 = gr.Button("评判审查报告")
+                        example2 = gr.Button("合同审查")
                         example3 = gr.Button("改写笑话")
             
             # Task Instructions
@@ -408,7 +408,7 @@ with gr.Blocks(css=custom_css) as demo:
                 
                 compile_button.click(
                     compile,
-                    inputs=set(inputs + outputs + [llm_model, teacher_model, dspy_module, example_data, upload_csv_btn, optimizer, instructions, metric_type, judge_prompt, hint_textbox]),
+                    inputs=inputs + outputs + [llm_model, teacher_model, dspy_module, example_data, upload_csv_btn, optimizer, instructions, metric_type, judge_prompt, hint_textbox],
                     outputs=[signature, evaluation_score, optimized_prompt, row_selector, random_row_button, row_choice_options, generate_button, generate_output, human_readable_id, human_readable_id, baseline_score]
                 )
 
@@ -530,23 +530,20 @@ with gr.Blocks(css=custom_css) as demo:
                     try:
                         df = pd.read_csv(file.name)
                         # Correctly assign input and output fields based on the actual arguments
-                        input_fields = []
-                        output_fields = []
+                        all_fields = []
                         filtered_args = [args[i] for i in range(0, len(args), 3)]  # Filter out descriptions and visibility
                         for arg in filtered_args:
                             if arg and isinstance(arg, str) and arg.strip():
-                                if len(input_fields) < len(input_values):
-                                    input_fields.append(arg)
-                                elif len(output_fields) < len(output_values):
-                                    output_fields.append(arg)
-                        expected_headers = input_fields + output_fields
+                                all_fields.append(arg)
+                        
+                        expected_headers = all_fields
                         
                         if list(df.columns) != expected_headers:
-                            return None, gr.update(visible=False), gr.update(visible=False), gr.update(visible=True, value=f"Error: CSV headers do not match expected format. Expected: {expected_headers}, Got: {list(df.columns)}")
-                        return df, gr.update(visible=True), gr.update(visible=True), gr.update(visible=False)
+                            return None, None, gr.update(visible=False), gr.update(visible=True, value=f"Error: CSV headers do not match expected format. Expected: {expected_headers}, Got: {list(df.columns)}"), gr.update(interactive=False), gr.update(interactive=False)
+                        return gr.update(value=df, visible=True), df, gr.update(visible=True), gr.update(visible=False), gr.update(interactive=False), gr.update(interactive=False)
                     except Exception as e:
-                        return None, gr.update(visible=False), gr.update(visible=False), gr.update(visible=True, value=f"Error: {str(e)}")
-                return None, gr.update(visible=False), gr.update(visible=False), gr.update(visible=False), gr.update(interactive=False), gr.update(interactive=False)
+                        return None, None, gr.update(visible=False), gr.update(visible=True, value=f"Error: {str(e)}"), gr.update(interactive=False), gr.update(interactive=False)
+                return None, None, gr.update(visible=False), gr.update(visible=False), gr.update(interactive=False), gr.update(interactive=False)
 
             # Function to show/hide the hint textbox based on the selected module
             def update_hint_visibility(module):
@@ -561,39 +558,37 @@ with gr.Blocks(css=custom_css) as demo:
 
             def update_example2():
                 return (
-                    gr.update(value="Tell me a funny joke"),
-                    gr.update(value="MIPROv2"),
-                    gr.update(value="LLM-as-a-Judge"),
+                    gr.update(value="根据提供的合同条款和视角，识别潜在风险并生成详细的风险审查报告"),
+                    gr.update(value="BootstrapFewShot"),
+                    gr.update(value="Exact Match"),
                     gr.update(value="gpt-4o-mini"),
                     gr.update(value="gpt-4o"),
-                    gr.update(value="Predict"),
-                    [("topic", "The topic of the joke")],
-                    [("joke", "The funny joke")],
+                    gr.update(value="ChainOfThought"),
+                    [("contract_text", "需要审查的合同条款文本"), ("perspective", "审查视角（如甲方或乙方）")],
+                    [("expected_report", "包含风险点名称、描述、原文定位和修改建议的详细风险报告")],
                     *disable_example_buttons(),
-                    load_csv("telling_jokes.csv"),
-                    gr.update(visible=True),
-                    gr.update(visible=True),
-                    gr.update(value=example2_signature, visible=True)  # Update judge_prompt
+                    load_csv("contract_review_samples.csv"),
+                    gr.update(visible=True)
                 )
 
             example2.click(
                 update_example2,
                 inputs=[],
-                outputs=[instructions, optimizer, metric_type, llm_model, teacher_model, dspy_module, input_values, output_values, example1, example2, example3, file_data, compile_button, judge_prompt]
+                outputs=[instructions, optimizer, metric_type, llm_model, teacher_model, dspy_module, input_values, output_values, example1, example2, example3, file_data, compile_button]
             )
 
             example1.click(
                 lambda _: (
-                    gr.update(value="Rate whether a joke is funny"),
-                    gr.update(value="BootstrapFewShotWithRandomSearch"),
+                    gr.update(value="评估合同风险审查报告的质量。评分标准：【优秀】必须完整包含风险点名称、风险描述、原文定位、修改建议四要素。【差】缺少1-2个要素。【不合格】缺少3个及以上要素或原文定位错误。"),
+                    gr.update(value="BootstrapFewShot"),
                     gr.update(value="Exact Match"),
                     gr.update(value="gpt-4o-mini"),
                     gr.update(value="gpt-4o"),
                     gr.update(value="ChainOfThought"),
-                    [("joke", "The joke to be rated"), ("topic", "The topic of the joke")],
-                    [("funny", "Whether the joke is funny or not, 1 or 0.")],
+                    [("contract_text", "原始合同条款文本"), ("perspective", "审查视角（甲方或乙方）"), ("generated_report", "待评估的合同风险审查报告")],
+                    [("quality_score", "质量评分：优秀、差或不合格")],
                     *disable_example_buttons(),
-                    load_csv("rating_jokes.csv"),
+                    load_csv("judge_contract_review.csv"),
                     gr.update(visible=True)
                 ),
                 inputs=[gr.State(None)],
